@@ -28,6 +28,10 @@ db.connect((err) => {
   console.log("MySQL connected");
 });
 
+app.use("/", (req, res) => {
+  res.send("Server is running");
+});
+
 // Multer for image upload
 const storage = multer.diskStorage({
   destination: "./schoolImages/",
