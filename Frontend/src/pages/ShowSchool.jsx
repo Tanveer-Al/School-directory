@@ -7,18 +7,30 @@ const ShowSchools = () => {
   const [error, setError] = useState('');
 
   const fetchSchools = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await axios.get('http://localhost:5000/api/schools');
+  setLoading(true);
+  setError('');
+  try {
+    const response = await axios.get('https://school-directory-ytn8.onrender.com/api/schools');
+    if (response.data === 'Server is running') {
+      // Handle the specific backend issue
+      console.error('Backend returned "Server is running" – likely a deployment error.');
+      setSchools([]);
+      setError('Server is not responding correctly. Please check backend deployment.');
+    } else if (Array.isArray(response.data)) {
       setSchools(response.data);
-    } catch (err) {
-      setError('Failed to load schools. Please check your connection and try again.');
-      console.error('Error fetching schools:', err);
-    } finally {
-      setLoading(false);
+    } else {
+      console.error('Invalid API response: Expected array, got', response.data);
+      setSchools([]);
+      setError('Invalid data received from server.');
     }
-  };
+  } catch (err) {
+    setError('Failed to load schools. Please check your connection and try again.');
+    console.error('Error fetching schools:', err);
+    setSchools([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchSchools();
@@ -56,6 +68,23 @@ const ShowSchools = () => {
     );
   }
 
+  if (!Array.isArray(schools)) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="text-center bg-white p-6 rounded-lg shadow-md max-w-md">
+          <p className="text-red-600">Error: Invalid data format. Please contact support.</p>
+          <button 
+            onClick={handleRetry} 
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors mt-4"
+            aria-label="Retry loading schools"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 p-2 sm:p-4">
       <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -77,10 +106,10 @@ const ShowSchools = () => {
           {schools.map((school) => (
             <div key={school.id} className="bg-white p-3 sm:p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
               <img 
-                src={school.image_path ? `http://localhost:5000/schoolImages/${school.image_path}` : '/placeholder-image.png'} 
+                src={school.image_path ? `https://school-directory-ytn8.onrender.com/schoolImages/${school.image_path}` : '/placeholder-image.png'} 
                 alt={`Image of ${school.name}`} 
                 className="w-full h-32 sm:h-40 md:h-48 object-cover rounded mb-3 sm:mb-4" 
-                onError={(e) => { e.target.src = '/placeholder-image.png'; }} // Fallback image
+                onError={(e) => { e.target.src = '/placeholder-image.png'; }}
               />
               <h3 className="text-base sm:text-lg font-semibold mb-2">{school.name}</h3>
               <p className="text-gray-600 text-sm mb-1">📍 {school.address}</p>

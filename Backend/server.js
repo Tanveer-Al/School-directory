@@ -28,10 +28,6 @@ db.connect((err) => {
   console.log("MySQL connected");
 });
 
-app.use("/", (req, res) => {
-  res.send("Server is running");
-});
-
 // Multer for image upload
 const storage = multer.diskStorage({
   destination: "./schoolImages/",
@@ -68,6 +64,11 @@ app.get("/api/schools", (req, res) => {
     console.log("Schools fetched successfully");
     res.json(results);
   });
+});
+
+// Root route (specific to "/" only, placed after API routes)
+app.get("/", (req, res) => {
+  res.send("Server is running");
 });
 
 // Start server with error handling

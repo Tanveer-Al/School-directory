@@ -20,7 +20,7 @@ const AddSchool = () => {
     if (data.image[0]) formData.append('image', data.image[0]);
 
     try {
-      await axios.post('http://localhost:5000/api/schools', formData);
+      await axios.post('https://school-directory-ytn8.onrender.com/api/schools', formData);
       alert('School added successfully!');
       navigate('/show-schools');
       reset();
